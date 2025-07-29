@@ -1,21 +1,26 @@
 'use client'
-import { Eye, EyeOff, Mail, User, Lock, ArrowRight, CheckCircle, Heart, Shield, Users } from 'lucide-react'
-import Link from 'next/link';
+import { User } from 'lucide-react'
+
 import RegisterForm from '../../../components/forms/RegisterForm';
 
-interface NavItem {
-  href:string
-  label: string
-}
 
-const navItems: NavItem[] = [
-  {href: '/', label: 'Home'},
-  {href: '/about', label: 'About'},
-  {href: '/contact', label: 'Contact'}
-]
+// interface NavItem {
+//   href:string
+//   label: string
+// }
+
+
+
+// const navItems: NavItem[] = [
+//   {href: '/', label: 'Home'},
+//   {href: '/about', label: 'About'},
+//   {href: '/contact', label: 'Contact'}
+// ]
 
 export default function SignUpPage(){
   
+  
+
 
   return(
     <div className="min-h-screen bg-gray-50">
@@ -36,8 +41,6 @@ export default function SignUpPage(){
               <p className='text-gray-600'>Start making a difference today</p>
             </div>
             <RegisterForm />
-
-
           </div>
           
         </div>

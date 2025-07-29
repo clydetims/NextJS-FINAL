@@ -9,7 +9,7 @@ import { guestLinks, financialLinks } from '@/constants/nav'
 import { ROLES, UserRole } from '@/constants/roles'
 import { Heart } from 'lucide-react'
 import useScrollDirection from '@/hooks/useScrollDirection'
-import { styleText } from 'util'
+
 
 // Simulated cookie/session role (for example only)
 const getRoleClientSide = (): UserRole => {
