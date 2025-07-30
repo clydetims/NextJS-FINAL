@@ -1,32 +1,62 @@
 import { NextResponse } from 'next/server'
+import pool from '@/lib/db'
+import { comparedPassword } from '@/utils/hash'
+import { generateToken } from '@/utils/jwt'
 
-export async function POST(request: Request) {
-  try {
-    // Parse JSON body from the request
-    const body = await request.json()
+export async function POST(req: Request) {
+    try {
+        const { email, password } = await req.json();
 
-    // Destructure values from the body
-    const { email, password } = body
+        //Check if user exists
+        const userRes = await pool.query(
+            'SELECT * FROM users WHERE email = $1', [email]
+        );
 
-    // Basic validation
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
+        if (userRes.rowCount === 0) {
+            return NextResponse.json(
+                {error: "Invalid email or password" },
+                { status: 401 }
+            );
+        }
+
+        const user = userRes.rows[0];
+
+        // Compare password
+        const isValid = await comparedPassword(password, user.password);
+        if(isValid) {
+            return NextResponse.json(
+                { error: "Invalid email or password" },
+                { status: 401 }
+            );
+        }
+
+        // Generate Token
+        const token = generateToken({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        });
+
+        // Set cooki for session
+        const response = NextResponse.json(
+            { message: "Login successful", token},
+            { status: 200 }
+        );
+
+        response.cookies.set("session_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 60*60*24, // 1 day
+        });
+
+        return response;
+
+    } catch (error) {
+        console.error("Login error: ", error);
+        return NextResponse.json({
+            error: "Server error"
+        }, {status: 500});
     }
-
-    // TODO: Add your login logic (e.g., check DB, hash password, etc.)
-    console.log('Logging in:', email, password)
-
-    // Example success response
-    return NextResponse.json({ success: true, message: 'Logged in successfully' })
-
-  } catch (error) {
-    console.error('Error in login route:', error)
-    return NextResponse.json(
-      { error: 'Invalid request' },
-      { status: 400 }
-    )
-  }
 }
+

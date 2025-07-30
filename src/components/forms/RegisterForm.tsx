@@ -54,31 +54,41 @@ export default function RegisterForm() {
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked: value}));
   };
 
-  const handleSubmit = async (e:FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log(formData)
+
+    // Prevent submission if terms not accepted
+    if (!formData.agreeToTerms) {
+      alert('You must agree to the terms and privacy policy.');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type' : 'application/json'},
-        body: JSON.stringify(formData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      // const data: SignupResponse = await response.json();
+      const data = await response.json();
 
-      if(response.ok) {
+      if (response.ok) {
         alert('Account created successfully!');
-
+        // Optionally reset form or redirect
       } else {
-        alert('Something went wrong')
+        alert(data.error || 'Something went wrong');
       }
     } catch (error) {
       console.error('Registration error:', error);
+      alert('Something went wrong. Please try again later.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
+
 
   
 
