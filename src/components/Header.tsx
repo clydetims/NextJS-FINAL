@@ -134,13 +134,22 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium hover:text-red-600 ${
-                pathname === link.href ? 'text-red-600 font-bold' : 'text-gray-700'
+              className={`${
+                link.label === 'Donate'
+                  ? 'bg-red-500 text-white px-4 py-2 rounded font-bold hover:bg-red-600'
+                  : 'text-sm font-medium text-gray-700 hover:text-red-600'
+              } ${
+                pathname === link.href && link.label !== 'Donate'
+                  ? 'text-red-600 font-bold'
+                  : ''
               }`}
             >
               {link.label}
             </Link>
           ))}
+          
+            
+
           
           {/* User profile section - only shown when authenticated */}
           {userData.isAuthenticated && (
@@ -181,6 +190,9 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+
+          
+              
           
           {user && (
             <div className="pt-2 border-t">
