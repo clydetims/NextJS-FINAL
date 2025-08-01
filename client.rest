@@ -1,0 +1,2 @@
+GET /api/auth/session
+Authorization: Bearer <token>

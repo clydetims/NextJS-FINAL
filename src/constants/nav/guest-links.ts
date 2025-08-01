@@ -1,7 +1,7 @@
 
 
 const guestLinks = [
-    {href: '/home', label: 'Home'},
+    {href: '/', label: 'Home'},
     {href: '/about', label: 'About'},
     {href: '/contact', label: 'Contact'},
     {href: '/login', label: 'Login'},

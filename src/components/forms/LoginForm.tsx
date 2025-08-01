@@ -22,50 +22,57 @@ export default function LoginPage() {
       ...prev, 
       [name]: type === 'checkbox' ? checked : value 
     }))
-    
   }
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsLoading(true);
     setErrors('')
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {'Contect-Type' : 'application/json'},
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           email: formData.email,
           password: formData.password
         })
-      })
 
-      const data = await res.json()
+      });
 
-      if(!res.ok) {
-        setErrors(data.error || "Login failed")
+
+      const data = await res.json();
+
+      if(!res.ok || !data.token){
+        console.log('Login failed')
+        setErrors(data.error || 'Login failed')
         setIsLoading(false)
-        console.log('Login error')
-        return
+        return;
       }
 
-      // Decode token if your api returns it
-      const token = data.token
-      const payload = JSON.parse(atob(token.split('.')[1]))
+      // localStorage.setItem('token', data.token);
 
-      // Redirect based on role
+      console.log('Login successful: ', data)
 
-      if (payload.role === 'financial') {
-        router.push('/financial')
-      } else {
-        router.push('/')
-      }
-    } catch (err) {
-      setErrors('Something went wrong. Please try again')
-      console.error('Login error:', err)
+      // Refresh state
+      router.refresh();
+
+      setTimeout(() => {
+        if(data.role === 'financial'){
+          router.push('/financial');
+        } else if (data.role === 'admin') {
+          router.push('/admin')
+        } else {
+          router.push('/')
+        }
+      }, 100);
+
+    } catch (error) {
+      setErrors('Something went wrong. Please try again');
+      console.error('Login error:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 

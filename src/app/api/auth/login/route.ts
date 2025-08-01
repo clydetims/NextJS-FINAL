@@ -1,62 +1,57 @@
-import { NextResponse } from 'next/server'
-import pool from '@/lib/db'
-import { comparedPassword } from '@/utils/hash'
+// /api/auth/login/route.ts
+import { NextResponse } from 'next/server';
+import pool from '@/lib/db';
 import { generateToken } from '@/utils/jwt'
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
-    try {
-        const { email, password } = await req.json();
+  const { email, password } = await req.json();
 
-        //Check if user exists
-        const userRes = await pool.query(
-            'SELECT * FROM users WHERE email = $1', [email]
-        );
+  try {
+    const client = await pool.connect();
 
-        if (userRes.rowCount === 0) {
-            return NextResponse.json(
-                {error: "Invalid email or password" },
-                { status: 401 }
-            );
-        }
+    const { rows } = await client.query(
+      'SELECT * FROM users WHERE email = $1 LIMIT 1',
+      [email]
+    );
 
-        const user = userRes.rows[0];
+    client.release();
 
-        // Compare password
-        const isValid = await comparedPassword(password, user.password);
-        if(isValid) {
-            return NextResponse.json(
-                { error: "Invalid email or password" },
-                { status: 401 }
-            );
-        }
+    const user = rows[0];
 
-        // Generate Token
-        const token = generateToken({
-            id: user.id,
-            email: user.email,
-            role: user.role,
-        });
-
-        // Set cooki for session
-        const response = NextResponse.json(
-            { message: "Login successful", token},
-            { status: 200 }
-        );
-
-        response.cookies.set("session_token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            path: "/",
-            maxAge: 60*60*24, // 1 day
-        });
-
-        return response;
-
-    } catch (error) {
-        console.error("Login error: ", error);
-        return NextResponse.json({
-            error: "Server error"
-        }, {status: 500});
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    const token = generateToken({
+      user_id: user.user_id,
+      email: user.email,
+      role: user.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+    });
+
+    const res = NextResponse.json({ message: 'Login successful'});
+
+    // Set secure HTTP-only cookie
+    res.cookies.set('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, //7 days
+    })
+
+    return res;
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
 }
 
