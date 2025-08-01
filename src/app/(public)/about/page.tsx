@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { Facebook } from 'react-feather';
+import { Instagram } from 'react-feather';
 
 const AboutPage = () => {
   return (
@@ -55,6 +57,46 @@ const AboutPage = () => {
             Together, we can make a difference in the lives of those who need it most.      
           </p>
         </section>
+        
+        <section className="mt-12 text-center">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Youth Scholar Story</h2>
+            <div className="flex justify-center">
+                <div className="w-full max-w-2xl aspect-video">
+                <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2Fmglmisyonero%2Fvideos%2F531577509511705%2F&show_text=false&width=476&t=0" 
+                width="476" height="476" style={{border:"none",overflow:"hidden"}} scrolling="no" frameBorder="0" 
+                    allowFullScreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+ 
+        <section className="mt-10 text-center">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Follow Us</h2>
+        <div className="flex justify-center space-x-6">
+            <a
+            href="https://www.facebook.com/pusongama"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-2 text-blue-600 hover:underline "
+            >
+            <Facebook className="w-6 h-6 text-center" />
+            <span>Facebook</span>
+            </a>
+
+            <a
+            href="https://www.instagram.com/pusongamamisyonero/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-2 text-pink-500 hover:underline"
+            >
+            <Instagram className="w-6 h-6" />
+            <span>Instagram</span>
+            </a>
+        </div>
+        </section>
+
+        
+
       </div>
     </main>
   );
