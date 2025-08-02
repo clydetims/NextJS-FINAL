@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         const hashedPassword = await hashPassword(password)
         const user_id = uuidv4()
         const created_at = new Date()
-        const role = 'guest'
+        const role = 'financial'
 
         await pool.query(
             `INSERT INTO users (user_id, first_name, last_name, email, password, role, created_at)
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
         })
 
-    } catch (error: any) {
+    } catch (error) {
         console.error(error)
         return NextResponse.json({ error: 'Internal Server Error'}, { status: 500 })
     }

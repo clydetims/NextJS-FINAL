@@ -3,26 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import Input from '@/components/Input'
 import { useState, ChangeEvent, FormEvent } from 'react'
 
-// interface SignUpForm {
-//   label: string
-//   type?: string
-//   id: string
-//   value: string
-//   onChange: (e: ChangeEvent<HTMLFormElement>) => void;
-//   error?: string;
-// }
 
-// interface FormData {
-//   first_name: string;
-//   last_name: string;
-//   email: string;
-//   password: string
-// }
-
-// interface SignupResponse {
-//   token?:string;
-//   error?: string
-// }
 
 interface FormData {
   first_name: string;

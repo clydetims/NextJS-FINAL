@@ -10,6 +10,7 @@ import { ROLES, UserRole } from '@/constants/roles'
 import { Heart } from 'lucide-react'
 import useScrollDirection from '@/hooks/useScrollDirection'
 import {useSession} from '@/hooks/useSession'
+import DonationModal from './DonationModal'
 
 interface UserData {
   role: UserRole;
@@ -30,6 +31,7 @@ export default function Header() {
   const scrollDirection = useScrollDirection();
   const [translateY, setTranslateY] = useState(0);
   const router = useRouter()
+  const [showModal, setShowModal] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -52,8 +54,13 @@ export default function Header() {
       }
 
       // Redirect to login and refresh
-      router.push('/login')
-      router.refresh()
+      window.location.href = '/login';
+
+      setTimeout(() => {
+
+        router.refresh()
+      }, 200)
+
     } catch (error) {
       console.error('Logout error:', error)
     }
@@ -63,7 +70,7 @@ export default function Header() {
   useEffect(() => {
     if (user) {
       setUserData({
-        role: user.role,
+        role: user.role as UserRole,
         first_name: user.first_name,
         last_name: user.last_name,
         isAuthenticated: true,
@@ -102,6 +109,18 @@ export default function Header() {
     return guestLinks
   }
 
+  const handleClickDonation = () => {
+    if(!userData.isAuthenticated){
+      alert('Please Login')
+      router.push('/login')
+    } 
+
+    if(userData.isAuthenticated) {
+      setShowModal(true);
+    }
+    return;
+  }
+
   const links = getLinks()
   let fullName = '';
   if (user) {
@@ -109,6 +128,8 @@ export default function Header() {
       ? `${user.first_name} ${user.last_name}`
       : user.first_name || '';
   }
+
+
 
 
   return (
@@ -131,34 +152,65 @@ export default function Header() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
           {links.map((link) => (
+
+
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium hover:text-red-600 ${
-                pathname === link.href ? 'text-red-600 font-bold' : 'text-gray-700'
-              }`}
+              className={`
+                ${link.label === 'Login' &&
+                  `bg-red-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-red-700 hover:text-white`}
+
+                ${link.label === 'Signup' && `border-red-500 border-1 px-4 py-2 rounded-lg text-red-500 hover:bg-gray-200`}
+                text-sm font-medium hover:text-red-600 
+
+                ${link.label === 'Donate' &&
+                  `flex items-center text-gray-700 text-[16px] font-normal px-4 py-2 rounded-lg cursor-pointer  `}
+                  
+              
+                ${
+
+                  pathname === link.href ? 'text-red-600 font-bold' : 'text-gray-700'
+                
+                }
+                `}
             >
+             
               {link.label}
             </Link>
           ))}
+          
           
           {/* User profile section - only shown when authenticated */}
           {userData.isAuthenticated && (
             <div className="flex items-center space-x-4">
               {fullName && (
                 <span className="text-sm font-medium text-gray-700">
-                  {user.first_name}
+                  {userData.first_name}
                 </span>
               )}
               <button 
                 onClick={handleLogout} 
-                className="text-sm font-medium text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
+                className="text-sm cursor-pointer font-medium text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
               >
                 Logout
               </button>
             </div>
           )}
+
+          {
+            userData.isAuthenticated
+          }
+          <button 
+            onClick={handleClickDonation}
+            className='text-gray-700 flex hover:text-red-500 cursor-pointer transition-colors duration-200'>
+            <Heart className='text-red-500 text-xl mr-2'/>
+            Donation
+          </button>
+
+          <DonationModal isOpen={showModal} onClose={() => setShowModal(false)}/>
         </div>
+
 
         {/* Mobile Toggle Button */}
         <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
@@ -181,7 +233,7 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          
+
           {user && (
             <div className="pt-2 border-t">
               {fullName && (

@@ -44,7 +44,7 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      if(!res.ok || !data.token){
+      if(!res.ok){
         console.log('Login failed')
         setErrors(data.error || 'Login failed')
         setIsLoading(false)
@@ -56,17 +56,17 @@ export default function LoginPage() {
       console.log('Login successful: ', data)
 
       // Refresh state
-      router.refresh();
-
+      
       setTimeout(() => {
-        if(data.role === 'financial'){
-          router.push('/financial');
+        if (data.role === 'financial') {
+          window.location.href = '/financial';
         } else if (data.role === 'admin') {
-          router.push('/admin')
+          window.location.href = '/admin';
         } else {
-          router.push('/')
+          window.location.href = '/';
         }
       }, 100);
+      router.refresh();
 
     } catch (error) {
       setErrors('Something went wrong. Please try again');
@@ -284,7 +284,7 @@ export default function LoginPage() {
             {/* Footer */}
             <div className="mt-8 text-center">
               <p className="text-gray-600">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-red-600 hover:text-red-700 font-semibold transition-colors">
                   Join our mission
                 </Link>

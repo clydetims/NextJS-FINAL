@@ -1,25 +1,29 @@
-// utils/jwt.ts
-// import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
+// Check once at module load time that SECRET is defined
+const SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set');
+}
 
-// export function generateToken(payload: object) {
-//   return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '7d' })
-// }
+interface JwtPayloadType extends JwtPayload {
+  [key: string]: unknown;
+}
 
-
-import jwt from 'jsonwebtoken'
-
-const SECRET = process.env.JWT_SECRET as string;
-
-export function generateToken(payload: object) {
+export function generateToken(payload: JwtPayloadType): string {
+  if (!SECRET) {
+    throw new Error('JWT_SECRET is not defined');
+  }
   return jwt.sign(payload, SECRET, { expiresIn: '7d' });
 }
 
-export function verifyToken(token: string) {
+export function verifyToken(token: string): JwtPayloadType | null {
+  if (!SECRET) {
+    throw new Error('JWT_SECRET is not defined');
+  }
   try {
-    return jwt.verify(token, SECRET) as any;
-
-  } catch (err) {
+    return jwt.verify(token, SECRET) as JwtPayloadType;
+  } catch {
     return null;
   }
 }
